@@ -8,7 +8,7 @@ My intent is to build a simple circuit for:
 * and to measure the ambient light with a LDR.
 All this controlled wirelessly.
 
-I have theses components for this task:
+I have these components for this task:
 * Arduino Nano -> Brain
 * esp2866 (esp-01) -> Wireless
 * DHT-22 -> Temperature and humidity. 
