@@ -19,6 +19,7 @@ I have these components for this task:
 * Small Arduino microphone -> Room noise 
 * RELAY -> To turn lamps on/off
 * AC to DC converter (YS-12v450A) -> To power the circuit
+* SD card reader -> Store the sensors information 
 * Some resistors.
 
 References:
