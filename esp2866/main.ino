@@ -30,7 +30,7 @@ void ReadCommand(char* command, unsigned lenght){
 
 void drawGraph() {
 	String out = "";
-	char temp[100];
+	char temp[600];
 	out += "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"400\" height=\"150\">\n";
  	out += "<rect width=\"400\" height=\"150\" fill=\"rgb(250, 230, 210)\" stroke-width=\"1\" stroke=\"rgb(0, 0, 0)\" />\n";
  	out += "<g stroke=\"black\">\n";
@@ -46,9 +46,14 @@ void drawGraph() {
 	server.send ( 200, "image/svg+xml", out);
 }
 
+void LightOn(){
+  Serial.print("ligth_on\n");
+	server.send ( 200, "text/plain", "Light On");
+}
+
 void handleRoot() {
 	digitalWrite ( led, 1 );
-	char temp[400];
+	char temp[1000];
 	int sec = millis() / 1000;
 	int min = sec / 60;
 	int hr = min / 60;
@@ -61,7 +66,7 @@ void handleRoot() {
   delay(100);
   ReadCommand(humidity, 10);
 
-	snprintf ( temp, 400, 
+	snprintf ( temp, 600, 
   "<html>\
   <head>\
     <meta http-equiv='refresh' content='5'/>\
@@ -77,11 +82,19 @@ void handleRoot() {
     <p>Uptime: %02d:%02d:%02d</p>\
     <p>Temperature: %s C</p>\
     <p>Humidity: %s </p>\
-    <img src=\"/test.svg\" />\
+    <button type=\"button\" onclick=\"loadDoc()\">Light on</button>\
+    <script>\
+    function loadDoc() {\
+    var xhttp = new XMLHttpRequest();\
+    xhttp.open(\"GET\", \"/light_on\", true);\
+    xhttp.send();\
+    }\
+    </script>\
+  <!--<img src=\"/test.svg\" />-->\
   </body>\
 </html>",hr, min % 60, sec % 60, temperature, humidity);
 	server.send ( 200, "text/html", temp);
-	digitalWrite ( led, 0 );
+	digitalWrite (led, 0);
 }
 
 void handleNotFound() {
@@ -128,23 +141,18 @@ void setup ( void ) {
 		Serial.println ( "MDNS responder started" );
 	}
 
-	server.on ( "/", handleRoot );
-	server.on ( "/test.svg", drawGraph );
-	server.on ( "/inline", []() {
-		server.send ( 200, "text/plain", "this works as well" );
+	server.on("/",handleRoot);
+	server.on("/test.svg",drawGraph);
+	server.on("/light_on",LightOn);
+	server.on("/inline",[]() {
+		server.send (200,"text/plain","this works as well");
 	} );
 	server.onNotFound ( handleNotFound );
 	server.begin();
 	Serial.println ( "HTTP server started" );
-
-
 }
 
 void loop ( void ) {
 	server.handleClient();
   delay(100);
-  
-  //Execute a command
 }
-
-
