@@ -3,8 +3,8 @@
 The objective of this project is to add sensor and actuators to a house, in
 order to be possible to control it, but not just this, the system should gather
 some data in order to make possible for the user to take decisions driven by
-data about his environment. Knowing the ambient noise, temperature, humidity and
-other quantities, all day long, it is possible to make smart decisions to make
+informations about his environment. Knowing the ambient noise, temperature, humidity and
+other quantities, all day long, it is possible to take smart decisions to make
 home a better place.
 
 My intent is to build a circuit for: 
@@ -24,7 +24,8 @@ I have these components for this task:
 * PIR -> Movement detection
 * Small Arduino microphone -> Room noise 
 * RELAY -> To turn lamps on/off
-* AC to DC converter (YS-12v450A) -> To power the circuit
+* AC to DC converter (YS-12v450A) (110-220v to 5v) -> To power the circuit
+* Step down power module (5V to 3.3V) -> Arduino can't power the esp8266 directly 
 * SD card reader -> Store the sensors information 
 * Some resistors.
 
