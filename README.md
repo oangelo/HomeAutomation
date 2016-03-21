@@ -1,7 +1,13 @@
-# Home Automation
+# Intellect Box
 
-This is a simple home automation project I am making for my home.
-My intent is to build a simple circuit for: 
+The objective of this project is to add sensor and actuators to a house, in
+order to be possible to control it, but not just this, the system should gather
+some data in order to make possible for the user to take decisions driven by
+data about his environment. Knowing the ambient noise, temperature, humidity and
+other quantities, all day long, it is possible to make smart decisions to make
+home a better place.
+
+My intent is to build a circuit for: 
 * turn on/off the lights of two lampshades, 
 * to record the room temperature and humidity, 
 * to detect presence using some PIRs, 
