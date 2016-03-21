@@ -1,0 +1,176 @@
+<html lang="en" dir="ltr">
+<head>
+<META HTTP-EQUIV="refresh" CONTENT="20">
+<title>Home Automation</title>
+<style>
+.button {
+  background-color: #008CBA;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  width:50%;
+  border-radius: 12px;
+}
+body{margin:0; padding:0; font-size:13px; font-family:Georgia, "Times New Roman", Times, serif;}
+
+.clear:after{content:"."; display:block; height:0; clear:both; visibility:hidden; line-height:0;}
+.clear{display:block; width:100%; clear:both;}
+html[xmlns] .clear{display:block;}
+* html .clear{height:1%;}
+
+a{outline:none; text-decoration:none;}
+
+.fl_left{float:left;}
+.fl_right{float:right;}
+
+/*----------------------------------------------HTML 5 Overrides-------------------------------------*/
+address, article, aside, figcaption, figure, footer, header, hgroup, nav, section{display:block; margin:0; padding:0;}
+/*----------------------------------------------Wrapper-------------------------------------*/
+
+div.wrapper{display:block; margin:0 auto; width:960px; text-align:left;}
+.row1{color:#C0BAB6; background-color:#333333;}
+.row2{color:#979797; background-color:#FFFFFF;}
+.row3, .row3 a{color:#FFFFFF; background-color:#1E1E1E;}
+
+/*----------------------------------------------Generalise-------------------------------------*/
+
+#header, #container, #footer{display:block; padding:10px;}
+
+h1, h2, h3, h4, h5, h6{margin:0; padding:0; font-size:24px; font-weight:normal; font-style:normal; line-height:normal;}
+
+/*----------------------------------------------Header-------------------------------------*/
+
+#header{padding:10px;}
+
+/*----------------------------------------------Content Container-------------------------------------*/
+
+/*--Content--*/
+
+#container #col1{padding:10px; display:block; float:left; width:460px; height:300px; color:#6C6E72; background-color:#DDDDDD;}
+
+#container #col2{padding:10px; display:block; float:left; width:460px; height:300px; color:#979797; background-color:#FFFFFF;}
+
+/*----------------------------------------------Footer-------------------------------------*/
+
+#footer{}
+</style>
+<script>
+function lighton() {
+  var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/light_on", true);
+    xhttp.send();
+}
+function lightoff() {
+  var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/light_off", true);
+    xhttp.send();
+}
+function sleep() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/sleep", true);
+    xhttp.send();
+}
+
+function GetVal(url, callbackFunction) {
+  var request =  new XMLHttpRequest();
+  request.open("GET", url, true);
+  request.setRequestHeader("Content-Type",
+      "application/x-www-form-urlencoded");
+
+  request.onreadystatechange = function() {
+    var done = 4, ok = 200;
+    if (request.readyState == done &&
+        request.status == ok) {
+      if (request.responseText) {
+        callbackFunction(request.responseText);
+      }
+    }
+  };
+  request.send();
+}
+
+function Temperature(text){
+  document.getElementById("temperature").innerHTML=text;
+}
+function Humidity(text){
+  document.getElementById("humidity").innerHTML=text;
+}
+function Motion(text){
+  document.getElementById("motion").innerHTML=text;
+}
+function Sound(text){
+  document.getElementById("sound").innerHTML=text;
+}
+function Luminosity(text){
+  document.getElementById("luminosity").innerHTML=text;
+}
+
+document.addEventListener("DOMContentLoaded", function(){
+  GetVal("/temperature", Temperature);
+});
+document.addEventListener("DOMContentLoaded", function(){
+  GetVal("/humidity", Humidity);
+});
+document.addEventListener("DOMContentLoaded", function(){
+  GetVal("/motion", Motion);
+});
+document.addEventListener("DOMContentLoaded", function(){
+  GetVal("/sound", Sound);
+});
+document.addEventListener("DOMContentLoaded", function(){
+  GetVal("/luminosity", Luminosity);
+});
+
+</script>
+</head>
+<body>
+<div class="wrapper row1">
+  <header id="header" class="clear">
+    <h1>Home Automation Painel</h1>
+  </header>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row2">
+  <div id="container" class="clear">
+    <div id="col1">
+      <br>
+      <h2>Controls:</h2>
+      <ul>
+      <button class="button" type="button" onclick="lighton()">Light ON</button><br>
+      <button class="button" type="button" onclick="lightoff()">Light OFF</button><br>
+      <button class="button" type="button" onclick="sleep()">Sleep</button><br>
+      </ul>
+    </div>
+    <div id="col2">
+      <br>
+      <h2>Informations:</h2>
+      <p>
+      <h3>
+      <ul>
+        <li>Temperature: <span id="temperature">nan</span> </li>
+        <li>humidity: <span id="humidity">nan</span> </li>
+        <li>Motion: <span id="motion">nan</span></li>
+        <li>Sound: <span id="sound">nan</span></li>
+        <li>Luminosity: <span id="luminosity">nan</span></li>
+      </ul>
+      </h3>
+      <!--<img src="/test.svg" />-->
+      </p>
+    </div>
+  </div>
+</div>
+<!-- ####################################################################################################### -->
+<div class="wrapper row3">
+  <footer id="footer" class="clear">
+    <p class="fl_left"><a href="https://github.com/oangelo/HomeAutomation">HomeAutomation</a></p>
+    <p class="fl_right">Up time: </p>
+  </footer>
+</div>
+</body>
+</html>

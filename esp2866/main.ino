@@ -3,6 +3,8 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 
+#include "html.h"
+
 const char *ssid = "StelarNetwork";
 const char *password = "star1966trek";
 
@@ -10,12 +12,20 @@ ESP8266WebServer server ( 80 );
 
 const int led = 13;
 
+String temperature = "";
+String humidity = "";
+String motion;
+String sound;
+String luminosity;
+
 void ReadCommand(char* command, unsigned lenght){
+  long unsigned time = millis();
+  while(!Serial.available() and (millis()-time < 1000)){}
   if(Serial.available()){
     char symbol = (char)Serial.read();
     unsigned count(0);
     while(symbol != '\n' and count < lenght){
-      delay(100);
+      delay(10);
       if(Serial.available()){
         command[count]=symbol;
         symbol = char(Serial.read());
@@ -25,6 +35,26 @@ void ReadCommand(char* command, unsigned lenght){
     command[count]='\0';
   }else{
     strncpy(command,"", lenght);
+  }
+}
+
+int ReadInt(){
+  unsigned char buf[sizeof(int)];
+  long unsigned time = millis();
+  while(!Serial.available() and (millis()-time < 10000)){}
+  if(Serial.available()){
+    byte symbol = (unsigned char)Serial.read();
+    unsigned count(0);
+    while(((char)symbol) != '\n' and count < sizeof(int)){
+      delay(10);
+      if(Serial.available()){
+        buf[count] = (unsigned char)Serial.read();
+        ++count;
+      }
+    }
+    return(*(int *)buf);
+  }else{
+    return(-1);
   }
 }
 
@@ -51,49 +81,73 @@ void LightOn(){
 	server.send ( 200, "text/plain", "Light On");
 }
 
-void handleRoot() {
-	digitalWrite ( led, 1 );
-	char temp[1000];
-	int sec = millis() / 1000;
+void LightOff(){
+  Serial.print("ligth_off\n");
+	server.send ( 200, "text/plain", "Light Off");
+}
+
+void LightSleep(){
+  Serial.print("ligth_off\n");
+	server.send ( 200, "text/plain", "sleep");
+}
+
+void UpTime(){
+  int sec = millis() / 1000;
 	int min = sec / 60;
 	int hr = min / 60;
-  char temperature[10] = "";
-  char humidity[10] = "";
-  Serial.print("temp\n");
-  delay(100);
-  ReadCommand(temperature, 10);
-  Serial.print("humidity\n");
-  delay(100);
-  ReadCommand(humidity, 10);
+	char temp[20];
+  char str[] = "%02d:%02d:%02d";
+	snprintf(temp,20,str,hr, min % 60, sec % 60);
+	server.send( 200, "text/plain", temp);
+}
 
-	snprintf ( temp, 600, 
-  "<html>\
-  <head>\
-    <meta http-equiv='refresh' content='5'/>\
-    <title>Home Automation</title>\
-    <style>\
-      body { background-color: #cccccc; font-family: Arial, Helvetica, Sans-Serif; Color: #000088; }\
-    </style>\
-  </head>\
-  <body>\
-  <center>\
-    <h1>System Painel</h1>\
-  </center>\
-    <p>Uptime: %02d:%02d:%02d</p>\
-    <p>Temperature: %s C</p>\
-    <p>Humidity: %s </p>\
-    <button type=\"button\" onclick=\"loadDoc()\">Light on</button>\
-    <script>\
-    function loadDoc() {\
-    var xhttp = new XMLHttpRequest();\
-    xhttp.open(\"GET\", \"/light_on\", true);\
-    xhttp.send();\
-    }\
-    </script>\
-  <!--<img src=\"/test.svg\" />-->\
-  </body>\
-</html>",hr, min % 60, sec % 60, temperature, humidity);
-	server.send ( 200, "text/html", temp);
+
+void ReadTemperature(){
+	server.send( 200, "text/plain", temperature);
+}
+
+void ReadHumidity(){
+	server.send( 200, "text/plain", humidity);
+}
+
+void ReadMotion(){
+	server.send( 200, "text/plain", motion);
+}
+
+void ReadSound(){
+	server.send ( 200, "text/plain", sound);
+}
+
+void ReadLuminosity(){
+	server.send ( 200, "text/plain", luminosity);
+}
+
+void GetSensorsData(){
+  Serial.print("temp\n");
+  if(Serial.find("t")){
+    temperature = String(Serial.parseFloat());
+  }
+  Serial.print("humidity\n");
+  if(Serial.find("h")){
+    humidity = String(Serial.parseFloat());
+  }
+  Serial.print("motion\n");
+  if(Serial.find("m")){
+    motion = String(Serial.parseInt());
+  }
+  Serial.print("sound\n");
+  if(Serial.find("s")){
+    sound = String(Serial.parseInt());
+  }
+  Serial.print("ldr\n");
+  if(Serial.find("l")){
+    luminosity = String(Serial.parseInt());
+  }
+}
+
+void handleRoot() {
+	digitalWrite ( led, 1 );
+  server.send ( 200, "text/html", main_html);
 	digitalWrite (led, 0);
 }
 
@@ -144,9 +198,14 @@ void setup ( void ) {
 	server.on("/",handleRoot);
 	server.on("/test.svg",drawGraph);
 	server.on("/light_on",LightOn);
-	server.on("/inline",[]() {
-		server.send (200,"text/plain","this works as well");
-	} );
+	server.on("/light_off",LightOff);
+	server.on("/light_sleep",LightSleep);
+	server.on("/temperature",ReadTemperature);
+	server.on("/humidity",ReadHumidity);
+	server.on("/motion",ReadMotion);
+	server.on("/sound",ReadSound);
+	server.on("/luminosity",ReadLuminosity);
+	server.on("/up_time",UpTime);
 	server.onNotFound ( handleNotFound );
 	server.begin();
 	Serial.println ( "HTTP server started" );
@@ -154,5 +213,7 @@ void setup ( void ) {
 
 void loop ( void ) {
 	server.handleClient();
-  delay(100);
+  if(millis() % 300 == 0){
+    GetSensorsData();
+  }
 }

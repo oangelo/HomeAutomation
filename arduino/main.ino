@@ -102,20 +102,25 @@ void loop() {
   if(strcmp(command, "") != 0){
     if(strcmp(command, "temp") == 0){
       float t = dht.readTemperature();
+      Serial.print("t");
       Serial.print(t);
       Serial.print('\n');
     } else if(strcmp(command, "humidity") == 0){
       float h = dht.readHumidity();
+      Serial.print("h");
       Serial.print(h);
       Serial.print('\n');
     }else if(strcmp(command, "sound") == 0){
+      Serial.print("s");
       Serial.print(sound_flag);
       Serial.print('\n');
     }else if(strcmp(command, "ldr") == 0){
       int ldr = analogRead(LDR);
+      Serial.print("l");
       Serial.print(ldr);
       Serial.print('\n');
     }else if(strcmp(command, "motion") == 0){
+      Serial.print("m");
       Serial.print(motion_flag);
       Serial.print('\n');
     }
